@@ -138,8 +138,8 @@ with tab_overall:
 
     fig_db = go.Figure()
 
-    # Connector lines
- for _, r in frontline_data.iterrows():
+# Connector lines
+for _, r in frontline_data.iterrows():
     fig_db.add_trace(go.Scatter(
         x=[r["Decrease"], r["Increase"]],
         y=[r["Reason"], r["Reason"]],
@@ -148,8 +148,9 @@ with tab_overall:
         showlegend=False,
         hoverinfo="skip"
     ))
-    # Decrease points
-   fig_db.add_trace(go.Scatter(
+
+# Decrease points (outside the loop)
+fig_db.add_trace(go.Scatter(
     x=frontline_data["Decrease"],
     y=frontline_data["Reason"],
     mode="markers+text",
@@ -164,8 +165,8 @@ with tab_overall:
     hovertemplate="%{y}<br>Decrease: %{x}%<extra></extra>"
 ))
 
-    # Increase points
-   fig_db.add_trace(go.Scatter(
+# Increase points (outside the loop)
+fig_db.add_trace(go.Scatter(
     x=frontline_data["Increase"],
     y=frontline_data["Reason"],
     mode="markers+text",
@@ -179,15 +180,16 @@ with tab_overall:
     name="Increase in Frontline Headcount",
     hovertemplate="%{y}<br>Increase: %{x}%<extra></extra>"
 ))
-    fig_db.update_layout(
-        xaxis_title="Percent of Companies (%)",
-        yaxis_title="",
-        height=max(520, 30 * len(frontline_data)),
-        margin=dict(l=20, r=20, t=10, b=10),
-        legend_title="",
-    )
 
-    st.plotly_chart(fig_db, use_container_width=True)
+fig_db.update_layout(
+    xaxis_title="Percent of Companies (%)",
+    yaxis_title="",
+    height=max(520, 30 * len(frontline_data)),
+    margin=dict(l=20, r=20, t=10, b=10),
+    legend_title="",
+)
+
+st.plotly_chart(fig_db, use_container_width=True)
 
 # ==================================================
 # TAB 2 — CATEGORY SNAPSHOT
