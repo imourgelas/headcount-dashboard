@@ -104,7 +104,7 @@ with tab_overall:
     # --------------------------------------------------
     # FRONTLINE HEADCOUNT COMPARISON (DUMBBELL)
     # --------------------------------------------------
-    st.markdown("### Frontline Headcount Drivers: Increase vs Decrease (Dumbbell)")
+    st.markdown("### Drivers of Increase or Decrease in Frontline Headcount in 2025 ")
 
     frontline_data = pd.DataFrame({
         "Reason": [
