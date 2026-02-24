@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 from pathlib import Path
+import plotly.graph_objects as go
 
 st.set_page_config(page_title="Drivers of Headcount Change in 2025", layout="wide")
 
@@ -55,20 +56,36 @@ with tab_overall:
     st.title("Drivers of Headcount Change in 2025")
     st.subheader("Overall (All Companies)")
 
-    overall_df = (
-        overall_values[reason_cols]
-        .reset_index()
-    )
-
+    overall_df = overall_values[reason_cols].reset_index()
     overall_df.columns = ["Reason", "Percent"]
     overall_df = overall_df.sort_values("Percent", ascending=False)
 
-    # Ranked List
+    # --------------------------------------------------
+    # Ranked List (numbered + subtle color pills)
+    # --------------------------------------------------
     st.markdown("### Ranked Drivers")
-    for i, row in overall_df.iterrows():
-        st.write(f"**{row['Reason']}** — {row['Percent']:.0f}%")
 
-    # Horizontal Bar Chart
+    top_k = min(25, len(overall_df))  # show top 25 by default
+    for rank, (_, row) in enumerate(overall_df.head(top_k).iterrows(), start=1):
+        pct = float(row["Percent"])
+        # editorial grayscale emphasis
+        chip_bg = "#111111" if pct >= 50 else "#3a3a3a" if pct >= 25 else "#6b6b6b"
+        st.markdown(
+            f"""
+            <div style="display:flex; align-items:center; gap:10px; margin:6px 0;">
+              <div style="min-width:30px; font-weight:600;">{rank}.</div>
+              <div style="flex:1; font-weight:500;">{row['Reason']}</div>
+              <div style="padding:2px 10px; border-radius:999px; background:{chip_bg}; color:#fff; font-weight:600;">
+                {pct:.0f}%
+              </div>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+
+    # --------------------------------------------------
+    # Overall Distribution (horizontal bar)
+    # --------------------------------------------------
     st.markdown("### Overall Distribution")
 
     fig = px.bar(
@@ -77,15 +94,17 @@ with tab_overall:
         y="Reason",
         orientation="h"
     )
-
-    fig.update_layout(yaxis={'categoryorder':'total ascending'})
+    fig.update_layout(
+        yaxis={'categoryorder': 'total ascending'},
+        xaxis_title="Percent of Companies (%)",
+        yaxis_title=""
+    )
     st.plotly_chart(fig, use_container_width=True)
 
     # --------------------------------------------------
-    # FRONTLINE HEADCOUNT COMPARISON
+    # FRONTLINE HEADCOUNT COMPARISON (DUMBBELL)
     # --------------------------------------------------
-
-    st.markdown("### Frontline Headcount Drivers: Increase vs Decrease")
+    st.markdown("### Frontline Headcount Drivers: Increase vs Decrease (Dumbbell)")
 
     frontline_data = pd.DataFrame({
         "Reason": [
@@ -113,23 +132,56 @@ with tab_overall:
         "Decrease": [59,17,14,3,17,0,52,24,31,21,28,28,21,21,14,0,14,28,24]
     })
 
-    frontline_long = frontline_data.melt(
-        id_vars="Reason",
-        var_name="Direction",
-        value_name="Percent"
+    # Sort by absolute gap so big differences stand out
+    frontline_data["Gap"] = (frontline_data["Increase"] - frontline_data["Decrease"]).abs()
+    frontline_data = frontline_data.sort_values("Gap", ascending=True)
+
+    fig_db = go.Figure()
+
+    # Connector lines
+    for _, r in frontline_data.iterrows():
+        fig_db.add_trace(go.Scatter(
+            x=[r["Decrease"], r["Increase"]],
+            y=[r["Reason"], r["Reason"]],
+            mode="lines",
+            line=dict(width=3),
+            showlegend=False,
+            hoverinfo="skip"
+        ))
+
+    # Decrease points
+    fig_db.add_trace(go.Scatter(
+        x=frontline_data["Decrease"],
+        y=frontline_data["Reason"],
+        mode="markers+text",
+        text=[f"{v:.0f}%" for v in frontline_data["Decrease"]],
+        textposition="middle left",
+        marker=dict(size=10),
+        name="Decrease in Frontline Headcount",
+        hovertemplate="%{y}<br>Decrease: %{x}%<extra></extra>"
+    ))
+
+    # Increase points
+    fig_db.add_trace(go.Scatter(
+        x=frontline_data["Increase"],
+        y=frontline_data["Reason"],
+        mode="markers+text",
+        text=[f"{v:.0f}%" for v in frontline_data["Increase"]],
+        textposition="middle right",
+        marker=dict(size=10),
+        name="Increase in Frontline Headcount",
+        hovertemplate="%{y}<br>Increase: %{x}%<extra></extra>"
+    ))
+
+    fig_db.update_layout(
+        xaxis_title="Percent of Companies (%)",
+        yaxis_title="",
+        height=max(520, 30 * len(frontline_data)),
+        margin=dict(l=20, r=20, t=10, b=10),
+        legend_title="",
     )
 
-    fig2 = px.bar(
-        frontline_long,
-        x="Percent",
-        y="Reason",
-        color="Direction",
-        barmode="group",
-        orientation="h"
-    )
-
-    fig2.update_layout(yaxis={'categoryorder':'total ascending'})
-    st.plotly_chart(fig2, use_container_width=True)
+    st.plotly_chart(fig_db, use_container_width=True)
 
 # ==================================================
 # TAB 2 — CATEGORY SNAPSHOT
