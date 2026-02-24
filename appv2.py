@@ -139,57 +139,57 @@ with tab_overall:
     fig_db = go.Figure()
 
 # Connector lines
-for _, r in frontline_data.iterrows():
-    fig_db.add_trace(go.Scatter(
-        x=[r["Decrease"], r["Increase"]],
-        y=[r["Reason"], r["Reason"]],
-        mode="lines",
-        line=dict(color="#B0B0B0", width=3),  # neutral gray
-        showlegend=False,
-        hoverinfo="skip"
-    ))
+    for _, r in frontline_data.iterrows():
+        fig_db.add_trace(go.Scatter(
+            x=[r["Decrease"], r["Increase"]],
+            y=[r["Reason"], r["Reason"]],
+            mode="lines",
+            line=dict(color="#B0B0B0", width=3),  # neutral gray
+            showlegend=False,
+            hoverinfo="skip"
+        ))
 
 # Decrease points (outside the loop)
-fig_db.add_trace(go.Scatter(
-    x=frontline_data["Decrease"],
-    y=frontline_data["Reason"],
-    mode="markers+text",
-    text=[f"{v:.0f}%" for v in frontline_data["Decrease"]],
-    textposition="middle left",
-    marker=dict(
-        size=11,
-        color="#E10600"   # bright executive red
-    ),
-    textfont=dict(color="#E10600"),
-    name="Decrease in Frontline Headcount",
-    hovertemplate="%{y}<br>Decrease: %{x}%<extra></extra>"
-))
+    fig_db.add_trace(go.Scatter(
+        x=frontline_data["Decrease"],
+        y=frontline_data["Reason"],
+        mode="markers+text",
+        text=[f"{v:.0f}%" for v in frontline_data["Decrease"]],
+        textposition="middle left",
+        marker=dict(
+            size=11,
+            color="#E10600"   # bright executive red
+        ),
+        textfont=dict(color="#E10600"),
+        name="Decrease in Frontline Headcount",
+        hovertemplate="%{y}<br>Decrease: %{x}%<extra></extra>"
+    ))
 
 # Increase points (outside the loop)
-fig_db.add_trace(go.Scatter(
-    x=frontline_data["Increase"],
-    y=frontline_data["Reason"],
-    mode="markers+text",
-    text=[f"{v:.0f}%" for v in frontline_data["Increase"]],
-    textposition="middle right",
-    marker=dict(
-        size=11,
-        color="#00A651"   # strong green
-    ),
-    textfont=dict(color="#00A651"),
-    name="Increase in Frontline Headcount",
-    hovertemplate="%{y}<br>Increase: %{x}%<extra></extra>"
-))
+    fig_db.add_trace(go.Scatter(
+        x=frontline_data["Increase"],
+        y=frontline_data["Reason"],
+        mode="markers+text",
+        text=[f"{v:.0f}%" for v in frontline_data["Increase"]],
+        textposition="middle right",
+        marker=dict(
+            size=11,
+            color="#00A651"   # strong green
+        ),
+        textfont=dict(color="#00A651"),
+        name="Increase in Frontline Headcount",
+        hovertemplate="%{y}<br>Increase: %{x}%<extra></extra>"
+    ))
 
-fig_db.update_layout(
-    xaxis_title="Percent of Companies (%)",
-    yaxis_title="",
-    height=max(520, 30 * len(frontline_data)),
-    margin=dict(l=20, r=20, t=10, b=10),
-    legend_title="",
-)
+    fig_db.update_layout(
+        xaxis_title="Percent of Companies (%)",
+        yaxis_title="",
+        height=max(520, 30 * len(frontline_data)),
+        margin=dict(l=20, r=20, t=10, b=10),
+        legend_title="",
+    )
 
-st.plotly_chart(fig_db, use_container_width=True)
+    st.plotly_chart(fig_db, use_container_width=True)
 
 # ==================================================
 # TAB 2 — CATEGORY SNAPSHOT
