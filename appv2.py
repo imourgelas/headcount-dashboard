@@ -220,18 +220,14 @@ with tab_insights:
 
     top_reason = overall_df.iloc[0]
 
-    paragraph = f"""
-    Across all companies, the dominant driver of headcount change in 2025 is 
-    {top_reason['Reason']} ({top_reason['Percent']:.0f}%). 
-    The data shows a clear divergence between organizations increasing and decreasing frontline headcount,
-    particularly around cost pressures and operational restructuring. 
-    Revenue-driven expansion remains a strong contributor to workforce growth,
-    while margin preservation and labor cost pressures are more strongly associated with reductions.
-    """
-
-    st.write(paragraph)
-    Among subcategories, {most_distinct} stands out as the most distinctive relative to the overall benchmark, 
-    suggesting structural or strategic differences compared with the broader company population.
-    """
+    paragraph = (
+        f"Across all companies, the dominant driver of headcount change in 2025 "
+        f"is {top_reason['Reason']} ({top_reason['Percent']:.0f}%). "
+        f"The data shows divergence between organizations increasing and decreasing "
+        f"frontline headcount, particularly around cost pressures and restructuring. "
+        f"Revenue-driven expansion continues to drive workforce growth, while "
+        f"margin preservation and labor cost pressures are more closely associated "
+        f"with reductions."
+    )
 
     st.write(paragraph)
